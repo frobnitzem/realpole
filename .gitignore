@@ -1,0 +1,7 @@
+*.pyc
+*.o
+*.eps
+*.dat
+*.png
+*.svg
+*.tex
