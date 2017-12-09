@@ -237,50 +237,49 @@ class FMM:
     def solve(self, u, **kwargs):
         return gmres(self, u, **kwargs)
 
-N = 10
-rand = np.random
-G = Poisson(12)
-f = FMM(G, G.ig_quad, G.calc, levels=4)
+def test():
+    N = 10
+    rand = np.random
+    G = Poisson(12)
+    f = FMM(G, G.ig_quad, G.calc, levels=4)
 
-x = rand.random((N,N,N,3))
-x[...,0] += arange(N)[:,newaxis,newaxis]
-x[...,1] += arange(N)[newaxis,:,newaxis]
-x[...,2] += arange(N)[newaxis,newaxis,:]
-N = N**3
-x = reshape(x, (N,3))*10.0
+    x = rand.random((N,N,N,3))
+    x[...,0] += arange(N)[:,newaxis,newaxis]
+    x[...,1] += arange(N)[newaxis,:,newaxis]
+    x[...,2] += arange(N)[newaxis,newaxis,:]
+    N = N**3
+    x = reshape(x, (N,3))*10.0
 
-f.grid(x) # create oct-tree
+    f.grid(x) # create oct-tree
 
-q = rand.random(N)-0.5
-# use FMM to compute potentials
-phi = f(q)
-phi2 = zeros(phi.shape)
-for i in range(N):
-    if i > 0:
-        phi2[i:i+1] += G.calc(q[:i], x[:i], x[i:i+1])
-    if i < N-1:
-        phi2[i:i+1] += G.calc(q[i+1:], x[i+1:], x[i:i+1])
-print sqrt(sum((phi - phi2)**2)/sum(phi2**2))
-exit(0)
+    q = rand.random(N)-0.5
+    # use FMM to compute potentials
+    phi = f(q)
+    phi2 = zeros(phi.shape)
+    for i in range(N):
+        if i > 0:
+            phi2[i:i+1] += G.calc(q[:i], x[:i], x[i:i+1])
+        if i < N-1:
+            phi2[i:i+1] += G.calc(q[i+1:], x[i+1:], x[i:i+1])
+    print sqrt(sum((phi - phi2)**2)/sum(phi2**2))
+    exit(0)
 
-#d = sqrt(sum((x[:,newaxis,:]-x)**2, 2))
-#for i in range(N):
-#    d[i,i] = 10.0
-#
-#M = 0.25/pi/d
-#for i in range(N):
-#    M[i,i] = 0.0
-#print M.max()
+    #d = sqrt(sum((x[:,newaxis,:]-x)**2, 2))
+    #for i in range(N):
+    #    d[i,i] = 10.0
+    #
+    #M = 0.25/pi/d
+    #for i in range(N):
+    #    M[i,i] = 0.0
+    #print M.max()
 
-#print np.linalg.eigh(M)[0]
-#q3 = np.linalg.solve(M, phi)
-#print q3 - q
+    #print np.linalg.eigh(M)[0]
+    #q3 = np.linalg.solve(M, phi)
+    #print q3 - q
 
-#phi = rand.random(100) # 100 random potential points
-q2 = f.solve(phi, tol=1e-8, no_progress_factor=1.0) # potential that generates 'em
+    #phi = rand.random(100) # 100 random potential points
+    q2 = f.solve(phi, tol=1e-8, no_progress_factor=1.0) # potential that generates 'em
 
-print q
-print q2 # statistics of sol'n, etc.
-
-
+    print q
+    print q2 # statistics of sol'n, etc.
 
