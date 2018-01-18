@@ -7,6 +7,8 @@ import os
 cwd = os.path.dirname(os.path.abspath(__file__))
 
 def read_rule(K):
+    if K == 1:
+        return array([[0., 0., 1.]]), array([4*pi])
     r = read_matrix("%s/rules/lebedev_%03d.txt"%(cwd,K))
     r[:,:2] *= pi/180.0 # th, phi
 
@@ -45,6 +47,8 @@ def e2poly(x, y, n, a):
     r = zeros((3,) + x.shape[:-1]+y.shape[:-1], dtype=x.dtype)
     r[0] = pow(r2, 0.5*a)
     yield r[0].copy()
+    if n < 2:
+        raise StopIteration
 
     x2 = sum(x*x, -1)
     for d in y.shape[:-1]:
